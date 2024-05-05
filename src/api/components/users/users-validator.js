@@ -20,6 +20,7 @@ module.exports = {
         .required()
         .label('Password'),
       password_confirm: joi.string().required().label('Password confirmation'),
+      balance: joi.number().required().label("Balance"),
     },
   },
 

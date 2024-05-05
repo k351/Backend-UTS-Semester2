@@ -38,6 +38,7 @@ async function getUser(id) {
     id: user.id,
     name: user.name,
     email: user.email,
+    balance: user.balance,
   };
 }
 
@@ -46,14 +47,15 @@ async function getUser(id) {
  * @param {string} name - Name
  * @param {string} email - Email
  * @param {string} password - Password
+ * @param {Number} balance - Balance
  * @returns {boolean}
  */
-async function createUser(name, email, password) {
+async function createUser(name, email, password, balance) {
   // Hash password
   const hashedPassword = await hashPassword(password);
 
   try {
-    await usersRepository.createUser(name, email, hashedPassword);
+    await usersRepository.createUser(name, email, hashedPassword, balance);
   } catch (err) {
     return null;
   }
