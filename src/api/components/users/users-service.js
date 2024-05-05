@@ -161,6 +161,96 @@ async function changePassword(userId, password) {
   return true;
 }
 
+/**
+ * Retrieve paginated users from the repository
+ * @param {int} page_number - Page number
+ * @param {int} page_size - Page size
+ * @param {String} searchQuery - Page size
+ * @param {String} sortQuery - Page size
+ * @returns {Array} - Array of paginated users
+ */
+
+async function getUsersPagination(page_number,page_size,searchQuery,sortQuery) {
+
+  page_number = parseInt(page_number);
+  page_size = parseInt(page_size);
+
+  let users = await usersRepository.getUsers();
+
+  // Apply searching
+  // Extract search field and search key
+  const [searchField, searchKey] = searchQuery.split(':');
+
+  // Apply searching
+  if (searchField && searchKey) {
+    let regex;
+    if (searchField === 'name') {
+      regex = new RegExp(searchKey, 'i');
+      users = users.filter((user) => regex.test(user.name));
+    } else if (searchField === 'email') {
+      regex = new RegExp(searchKey, 'i');
+      users = users.filter((user) => regex.test(user.email));
+    }
+  }
+
+  // Apply sorting
+  if (sortQuery) {
+    const [field, order] = sortQuery.split(':');
+    users.sort((a, b) => {
+      if (order === 'desc') {
+        return b[field] > a[field] ? 1 : -1;
+      } else if (order === 'asc') {
+        return a[field] > b[field] ? 1 : -1;
+      }
+    });
+  }
+
+  // Apply pagination
+  if (!users || users.length === 0) {
+    return {
+      page_number: page_number,
+      page_size: page_size,
+      count: results.length,
+      data: [],
+    };
+  }
+
+  const startIndex = (page_number - 1) * page_size;
+  const endIndex = startIndex + page_size;
+
+  nextPage = false;
+  previousPage = false;
+  totalPages = Math.ceil(users.length / page_size);
+
+  if (users.length - 1 > endIndex - 1) {
+    nextPage = true;
+  }
+  if (startIndex > 0) {
+    previousPage = true;
+  }
+
+  const results = [];
+  for (let i = startIndex; i < endIndex && i < users.length; i += 1) {
+    const user = users[i];
+    results.push({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    });
+  }
+
+  return {
+    page_number: page_number,
+    page_size: page_size,
+    count: results.length,
+    total_pages: totalPages,
+    has_previous_page: previousPage,
+    has_next_page: nextPage,
+    data: results,
+  };
+}
+
+
 module.exports = {
   getUsers,
   getUser,
@@ -170,4 +260,5 @@ module.exports = {
   emailIsRegistered,
   checkPassword,
   changePassword,
+  getUsersPagination,
 };
