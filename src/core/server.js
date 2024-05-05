@@ -31,7 +31,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Log HTTP requests with Pino
-app.use(pinoHTTP({ logger }));
+// app.use(pinoHTTP({ logger }));
 
 // Health check endpoints
 app.get('/status', (_, response) => response.status(200).end());
