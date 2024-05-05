@@ -1,5 +1,6 @@
 const transactionsService = require("./transactions-service")
 const { errorResponder, errorTypes } = require('../../../core/errors');
+const {getUser} = require("../users/users-repository");
 
 /**
  * Handle create user request
