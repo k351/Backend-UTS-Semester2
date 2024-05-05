@@ -33,6 +33,38 @@ async function createTransaction(request, response, next) {
   }
 }
 
+/**
+ * Handle get user detail request
+ * @param {object} request - Express request object
+ * @param {object} response - Express response object
+ * @param {object} next - Express route middlewares
+ * @returns {object} Response object or pass an error to the next route
+ */
+async function getTransactionbyId(request, response, next) {
+  try {
+    const transaction_id = request.params.id;
+    const user_id = request.params.user_id;
+
+    const user = await getUser(user_id);
+
+    if (!user) {
+      throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, 'Unknown user');
+    }
+    
+    const transaction = await transactionsService.getTransactionbyId(transaction_id, user_id);
+
+    if (!transaction) {
+      throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, "Transaction doesn't exist!");
+    }
+
+    return response.status(200).json(transaction);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+
 module.exports = {
   createTransaction,
+  getTransactionbyId,
 }

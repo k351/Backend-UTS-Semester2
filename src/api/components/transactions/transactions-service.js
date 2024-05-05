@@ -42,6 +42,33 @@ async function createTransaction(user_id, receiver_id, amount, description, type
   return true;
 }
 
+
+/**
+ * Get Transactio  detail
+ * @param {string} id - Transaction ID
+ * @param {string} user_id - User ID
+ * @returns {Object}
+ */
+async function getTransactionbyId(id, user_id) {
+  const transaction = await transactionsRepository.getTransactionbyId(id);
+  const user = await getUser(user_id);
+
+  // User not found
+  if (!transaction || (transaction.user_id !== user.id)) {
+    return null;
+  }
+
+  return {
+    transaction_id: transaction.id,
+    user_id: transaction.user_id,
+    receiver_id: transaction.receiver_id,
+    amount: transaction.amount,
+    description: transaction.description,
+    type: transaction.type,
+  };
+}
+
 module.exports = {
   createTransaction,
+  getTransactionbyId,
 }

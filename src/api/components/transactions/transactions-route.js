@@ -18,4 +18,10 @@ module.exports = (app) => {
     transactionsController.createTransaction,
   );
 
+  // Get transaction inf0
+  route.get(
+    '/:user_id/transaction/:id',
+    authenticationMiddleware,
+    transactionsController.getTransactionbyId,
+  );
 };

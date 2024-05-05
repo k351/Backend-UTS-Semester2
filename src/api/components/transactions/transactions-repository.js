@@ -19,6 +19,16 @@ async function createTransaction(user_id, receiver_id, amount, description, type
   });
 }
 
+/**
+ * Get transaction detail
+ * @param {string} id - User ID
+ * @returns {Promise}
+ **/
+async function getTransactionbyId(id) {
+  return Transaction.findById(id);
+}
+
 module.exports = {
   createTransaction,
+  getTransactionbyId,
 };
