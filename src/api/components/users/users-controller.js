@@ -189,6 +189,36 @@ async function changePassword(request, response, next) {
   }
 }
 
+/**
+ * Handle change user password request
+ * @param {object} request - Express request object
+ * @param {object} response - Express response object
+ * @param {object} next - Express route middlewares
+ * @returns {object} Response object or pass an error to the next route
+ */
+async function getUsersPagination(request, response, next) {
+  try {
+
+    const usersLength = await usersService.getUsers();
+
+    const pagenumber = request.query.page_number || 1;
+    const pagesize = request.query.page_size || usersLength.length;
+    const searchQuery = request.query.search || ''; 
+    const sortQuery = request.query.sort || 'email:asc'; 
+
+    const users = await usersService.getUsersPagination(pagenumber, pagesize,searchQuery, sortQuery);
+
+    if (users.length === 0) {
+      return response.status(404).json({ message: 'No users found matching the search criteria.' });
+    }
+
+    return response.status(200).json(users);
+  } 
+  catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   getUsers,
   getUser,
@@ -196,4 +226,5 @@ module.exports = {
   updateUser,
   deleteUser,
   changePassword,
+  getUsersPagination,
 };
