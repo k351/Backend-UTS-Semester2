@@ -68,7 +68,55 @@ async function getTransactionbyId(id, user_id) {
   };
 }
 
+/**
+ * Update existing user
+ * @param {string} id - User ID
+ * @param {string} receiver_id - Name
+ * @param {Number} amount - Email
+ * @returns {boolean}
+ */
+async function updateTransaction(id, receiver_id, amount) {
+  const transaction = await transactionsRepository.getTransactionbyId(id);
+
+  // User not found
+  if (!transaction) {
+    return null;
+  }
+
+  try {
+    await transactionsRepository.updateTransaction(id, receiver_id, amount);
+  } catch (err) {
+    return null;
+  }
+
+  return true;
+}
+
+/**
+ * Delete user
+ * @param {string} id - User ID
+ * @returns {boolean}
+ */
+async function deleteTransaction(id) {
+  const transaction = await transactionsRepository.getTransactionbyId(id);
+
+  // User not found
+  if (!transaction) {
+    return null;
+  }
+
+  try {
+    await transactionsRepository.deleteTransaction(id);
+  } catch (err) {
+    return null;
+  }
+
+  return true;
+}
+
 module.exports = {
   createTransaction,
   getTransactionbyId,
+  updateTransaction,
+  deleteTransaction,
 }

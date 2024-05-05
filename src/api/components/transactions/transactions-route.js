@@ -24,4 +24,15 @@ module.exports = (app) => {
     authenticationMiddleware,
     transactionsController.getTransactionbyId,
   );
+
+  // Update user
+  route.put(
+    '/transaction/:transaction_id',
+    authenticationMiddleware,
+    celebrate(transactionsValidator.updateTransaction),
+    transactionsController.updateTransaction
+  );
+
+  // Delete Transaction
+  route.delete('/transaction/:transaction_id', authenticationMiddleware, transactionsController.deleteTransaction);
 };

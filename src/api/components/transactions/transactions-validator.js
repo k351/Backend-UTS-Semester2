@@ -9,4 +9,11 @@ module.exports = {
       type: joi.string().required().label("Type"),
     },
   },
+
+  updateTransaction: {
+    body: {
+      receiver_id: joi.string().min(24).max(24).label('Receiver_id'),
+      amount: joi.number().label('Amount'),
+    },
+  },
 };

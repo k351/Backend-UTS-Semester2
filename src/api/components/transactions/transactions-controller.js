@@ -64,8 +64,61 @@ async function getTransactionbyId(request, response, next) {
   }
 }
 
+/**
+ * Handle update user request
+ * @param {object} request - Express request object
+ * @param {object} response - Express response object
+ * @param {object} next - Express route middlewares
+ * @returns {object} Response object or pass an error to the next route
+ */
+async function updateTransaction(request, response, next) {
+  try {
+    const transaction_id = request.params.transaction_id;
+    const receiver_id = request.body.receiver_id;
+    const amount = request.body.amount;
+
+    const success = await transactionsService.updateTransaction(transaction_id, receiver_id, amount);
+    if (!success) {
+      throw errorResponder(
+        errorTypes.UNPROCESSABLE_ENTITY,
+        'Failed to update transaction'
+      );
+    }
+
+    return response.status(200).json(transaction_id);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
+ * Handle delete user request
+ * @param {object} request - Express request object
+ * @param {object} response - Express response object
+ * @param {object} next - Express route middlewares
+ * @returns {object} Response object or pass an error to the next route
+ */
+async function deleteTransaction(request, response, next) {
+  try {
+    const transaction_id = request.params.transaction_id;
+
+    const success = await transactionsService.deleteTransaction(transaction_id);
+    if (!success) {
+      throw errorResponder(
+        errorTypes.UNPROCESSABLE_ENTITY,
+        'Failed to delete transaction'
+      );
+    }
+
+    return response.status(200).json({transaction_id});
+  } catch (error) {
+    return next(error);
+  }
+}
 
 module.exports = {
   createTransaction,
   getTransactionbyId,
+  updateTransaction,
+  deleteTransaction
 }
