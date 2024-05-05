@@ -5,7 +5,7 @@ const { errorResponder, errorTypes } = require('../../../core/errors');
 const logger = require("../../../core/logger")("app");
 
 const LOGIN_ATTEMPT_LIMIT = 5; // Maximum number of failed login attempts allowed
-const LOGIN_TIMEOUT_DURATION = 1 * 60 * 1000; // Timeout duration in milliseconds (60 minute)
+const LOGIN_TIMEOUT_DURATION = 30 * 60 * 1000; // Timeout duration in milliseconds (60 minute)
 
 // Define an object to keep track of failed login attempts
 const failedLoginAttempts = {};
