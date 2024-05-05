@@ -76,6 +76,8 @@ async function getTransactionbyId(id, user_id) {
  * @returns {boolean}
  */
 async function updateTransaction(id, receiver_id, amount) {
+  const receiver =  await getUser(receiver_id);
+
   const transaction = await transactionsRepository.getTransactionbyId(id);
 
   // User not found
@@ -84,6 +86,11 @@ async function updateTransaction(id, receiver_id, amount) {
   }
 
   try {
+    sender.balance -= (amount - transaction.amount);
+    receiver.balance += (amount - transaction.amount);
+
+    // Save changes to the database
+    await Promise.all([sender.save(), receiver.save()]);
     await transactionsRepository.updateTransaction(id, receiver_id, amount);
   } catch (err) {
     return null;
