@@ -94,15 +94,18 @@ async function updateTransaction(id, receiver_id, amount) {
     // Update the transaction
     await transactionsRepository.updateTransaction(id, receiver_id, amount);
 
+    const newReceiver = await getUser(receiver_id);
     // Apply new changes
     sender.balance -= amount;
-    receiver.balance += amount;
+    newReceiver.balance += amount;
 
     // Save changes to the database
-    await Promise.all([sender.save(), receiver.save()]);
+    await Promise.all([sender.save(), receiver.save(), newReceiver.save()]);
   } catch (err) {
     return null;
   }
+
+  return true
 }
 
 /**
@@ -121,8 +124,10 @@ async function deleteTransaction(id) {
   try {
     // Refund the amount to the sender
     const sender = await getUser(transaction.user_id);
+    const receiver = await getUser(transaction.receiver_id);
     sender.balance += transaction.amount;
-    await sender.save();
+    receiver.balance -= transaction.amount
+    await Promise.all([sender.save(), receiver.save()]);
 
     // Delete the transaction
     await transactionsRepository.deleteTransaction(id);
