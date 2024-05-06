@@ -78,18 +78,31 @@ async function getTransactionbyId(id, user_id) {
 async function updateTransaction(id, receiver_id, amount) {
   const transaction = await transactionsRepository.getTransactionbyId(id);
 
-  // User not found
+  // Transaction not found
   if (!transaction) {
     return null;
   }
 
   try {
+    // Revert previous changes
+    const sender = await getUser(transaction.user_id);
+    const receiver = await getUser(transaction.receiver_id);
+
+    sender.balance += transaction.amount;
+    receiver.balance -= transaction.amount;
+
+    // Update the transaction
     await transactionsRepository.updateTransaction(id, receiver_id, amount);
+
+    // Apply new changes
+    sender.balance -= amount;
+    receiver.balance += amount;
+
+    // Save changes to the database
+    await Promise.all([sender.save(), receiver.save()]);
   } catch (err) {
     return null;
   }
-
-  return true;
 }
 
 /**
@@ -100,12 +113,18 @@ async function updateTransaction(id, receiver_id, amount) {
 async function deleteTransaction(id) {
   const transaction = await transactionsRepository.getTransactionbyId(id);
 
-  // User not found
+  // Transaction not found
   if (!transaction) {
     return null;
   }
 
   try {
+    // Refund the amount to the sender
+    const sender = await getUser(transaction.user_id);
+    sender.balance += transaction.amount;
+    await sender.save();
+
+    // Delete the transaction
     await transactionsRepository.deleteTransaction(id);
   } catch (err) {
     return null;
